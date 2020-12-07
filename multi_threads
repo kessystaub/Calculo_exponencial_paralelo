@@ -26,7 +26,7 @@ void separa_blocos(int inicio, int fim, int respostas[10], int expoentes[10], in
 
 
 int main() {
-	int base = 0, expoente = 0, resposta = 0;
+	int base = 0, expoente = 0, resposta = 0, inicio = 0, fim = 0, tamanho_vetor = 10;
 	int bases[10] = {2,2,2,2,2,2,2,2,2,2};
 	int expoentes[10] = {0,1,2,3,4,5,6,7,8,9};
 	int respostas[10] = { 0,0,0,0,0,0,0,0,0,0 };
@@ -34,35 +34,19 @@ int main() {
 	double tempo_execucao = 0.0000;
 	double inicio = omp_get_wtime();
 
-	
-
 	#pragma omp parallel num_threads(5)
 	{
 		int id = omp_get_thread_num();
 
-		printf("Thread %i \n", id);
-		int inicio=0, fim=0;
+		#pragma omp single
+		int total_threads = omp_get_num_threads();
 
-		if (id == 0) {
-			inicio = 0;
-			fim = 2;
-		}
-		else if(id==1){
-			inicio = 2;
-			fim = 4;
-		}
-		else if(id==2) {
-			inicio = 4;
-			fim = 6;
-		}
-		else if (id == 3) {
-			inicio = 6;
-			fim = 8;
-		}
-		else if (id == 4) {
-			inicio = 8;
-			fim = 10;
-		}
+		printf("Thread %i \n", id);
+		
+
+		int bloco = tamanho_vetor / total_threads,
+			inicio = id * bloco,
+			fim = inicio + bloco;
 
 		separa_blocos(inicio, fim, respostas, expoentes, bases);
 	}
@@ -72,7 +56,7 @@ int main() {
 
 	for (int i = 0; i < 10; i++)
 	{
-		printf("Thread --> resposta da exponencial: %i \n", respostas[i]);
+		printf("Thread --> resposta da exponencial: %i \n",respostas[i]);
 	}
 
 	//cout << "tempo execucao: " << tempo_execucao << endl;
