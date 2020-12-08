@@ -1,7 +1,7 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <omp.h>
+#include <time.h>
 #include <iostream>
 
 
@@ -25,18 +25,69 @@ void separa_partes(int inicio, int fim, int respostas[10], int expoentes[10], in
 	}
 }
 
+int sorteio(int maximo, int minimo = 0) {
+	int i;
+	i = rand() % maximo + minimo;
+	return i;
+}
+
+
+void cria_vetor(int vetor[], int tamanho, int max, int min=0) {
+	if (max == 0) {
+		for (int i = 0; i < tamanho; i++)
+		{
+			vetor[i] = 0;
+		}
+	}
+	else {
+		for (int i = 0; i < tamanho; i++)
+		{
+			vetor[i] = sorteio(max, min);
+		}
+	}
+}
+
+
 
 int main() {
 	int inicio = 0, fim = 25;
-	int bases[25] = {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
-	int expoentes[25] = {0,1,2,3,4,5,6,7,8,9,8,7,6,5,4,3,2,1,0,2,3,4,2,3,4};
-	int respostas[25] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	int bases[25];
+	int expoentes[25];
+	int respostas[25];
 
+	cria_vetor(bases,25,9,1);
+	cria_vetor(expoentes, 25, 5, 1);
+	cria_vetor(respostas, 25, 0);
+
+	for (int i = 0; i < 25; i++)
+	{
+		if (i == 0) {
+			printf("Base %i ", bases[i]);
+		}
+		printf("%i ", bases[i]);
+	}
+
+	for (int i = 0; i < 25; i++)
+	{
+		if (i == 0) {
+			printf("\nExpoente %i ", expoentes[i]);
+		}
+		printf("%i ", expoentes[i]);
+	}
+	for (int i = 0; i < 25; i++)
+	{
+		if (i == 0) {
+			printf("\nRespostas %i ", respostas[i]);
+		}
+		printf("%i ", respostas[i]);
+	}
+
+	
 	double tempo_execucao = 0.0000;
 	double inicio_tempo = omp_get_wtime();
 
 	int tamanho_vetor = 25;
-
+	
 	#pragma omp parallel num_threads(5)
 	{
 		int id = omp_get_thread_num();
@@ -47,7 +98,7 @@ int main() {
 				int parte = 5,
 					inicio = id * parte,
 					fim = inicio + parte;
-				printf("Thread %i --> Fez o parte com inicio em %i e fim em %i \n", id, inicio, fim);
+				printf("\nThread %i --> Fez o parte com inicio em %i e fim em %i \n", id, inicio, fim);
 				separa_partes(inicio, fim, respostas, expoentes, bases);
 			}
 			#pragma omp section 
@@ -91,7 +142,7 @@ int main() {
 
 	for (int i = 0; i < 25; i++)
 	{
-		// printf("Resposta da exponencial: %i \n", respostas[i]);
+		printf("Resposta da exponencial: %i \n", respostas[i]);
 	}
 
 	cout << "tempo execucao: " << tempo_execucao << endl;
