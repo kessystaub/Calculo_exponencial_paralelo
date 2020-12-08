@@ -1,1 +1,99 @@
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <omp.h>
+#include <iostream>
+
+
+using namespace std;
+
+
+int calcula(int base, int expoente) {
+	if (expoente == 0) {
+		return 1;
+	}
+	else {
+		return base * calcula(base, expoente - 1);
+	}
+}
+
+
+void separa_partes(int inicio, int fim, int respostas[10], int expoentes[10], int bases[10]) {
+	for (int i = inicio; i < fim; i++)
+	{
+		respostas[i] = calcula(bases[i], expoentes[i]);
+	}
+}
+
+
+int main() {
+	int inicio = 0, fim = 25;
+	int bases[25] = {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
+	int expoentes[25] = {0,1,2,3,4,5,6,7,8,9,8,7,6,5,4,3,2,1,0,2,3,4,2,3,4};
+	int respostas[25] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+	double tempo_execucao = 0.0000;
+	double inicio_tempo = omp_get_wtime();
+
+	int tamanho_vetor = 25;
+
+	#pragma omp parallel num_threads(5)
+	{
+		int id = omp_get_thread_num();
+		#pragma omp sections nowait
+		{
+			#pragma omp section
+			{
+				int parte = 5,
+					inicio = id * parte,
+					fim = inicio + parte;
+				printf("Thread %i --> Fez o parte com inicio em %i e fim em %i \n", id, inicio, fim);
+				separa_partes(inicio, fim, respostas, expoentes, bases);
+			}
+			#pragma omp section 
+			{
+				int parte = 5,
+					inicio = id * parte,
+					fim = inicio + parte;
+				printf("Thread %i --> Fez o parte com inicio em %i e fim em %i \n", id, inicio, fim);
+				separa_partes(inicio, fim, respostas, expoentes, bases);
+			}
+			#pragma omp section 
+			{
+				int parte = 5,
+					inicio = id * parte,
+					fim = inicio + parte;
+				printf("Thread %i --> Fez o parte com inicio em %i e fim em %i \n", id, inicio, fim);
+				separa_partes(inicio, fim, respostas, expoentes, bases);
+			}
+			#pragma omp section 
+			{
+				int parte = 5,
+					inicio = id * parte,
+					fim = inicio + parte;
+				printf("Thread %i --> Fez o parte com inicio em %i e fim em %i \n", id, inicio, fim);
+				separa_partes(inicio, fim, respostas, expoentes, bases);
+			}
+			#pragma omp section 
+			{
+				int parte = 5,
+					inicio = id * parte,
+					fim = inicio + parte;
+				printf("Thread %i --> Fez o parte com inicio em %i e fim em %i \n", id, inicio, fim);
+				separa_partes(inicio, fim, respostas, expoentes, bases);
+			}
+		}
+	}
+
+	double final = omp_get_wtime();
+	tempo_execucao = (final - inicio_tempo);
+
+
+	for (int i = 0; i < 25; i++)
+	{
+		// printf("Resposta da exponencial: %i \n", respostas[i]);
+	}
+
+	cout << "tempo execucao: " << tempo_execucao << endl;
+	
+}
